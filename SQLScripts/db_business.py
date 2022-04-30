@@ -1,0 +1,7 @@
+TABLE_NAME = 'Business'
+ID = 'id'
+OWNER_ID = 'owner_id'
+NAME = 'name'
+PHOTO_ID = 'photo_id'
+DESCRIPTION = 'description'
+TIME_OF_WORK = 'time_of_work'

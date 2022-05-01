@@ -1,7 +1,5 @@
-from datetime import timedelta
-
 import psycopg2
-from SQLScripts import db_records, db_worker
+from db_names import db_records
 from config import host, user, password, db_name
 
 

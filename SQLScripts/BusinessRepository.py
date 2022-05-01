@@ -1,5 +1,5 @@
 import psycopg2
-from SQLScripts import db_business
+from db_names import db_business
 from config import host, user, password, db_name
 
 
@@ -33,7 +33,7 @@ async def AddBusiness(state):
                 cursor.execute(insert_query, data)
                 connection.commit()
                 print("[INFO] Data was added")
-                return True;
+                return True
     except Exception as _ex:
         print("[INFO] error database", _ex)
 

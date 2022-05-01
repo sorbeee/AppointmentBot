@@ -14,5 +14,5 @@ kb_admin.add(b5)
 kb_admin_downloading = ReplyKeyboardMarkup(resize_keyboard=True)
 kb_admin_downloading.add(b4)
 
-kb_admin_time = ReplyKeyboardMarkup(resize_keyboard=True).add(KeyboardButton('30 хвилин')).insert(KeyboardButton('45 хвилин')).insert(KeyboardButton('1 година'))
+kb_admin_time = ReplyKeyboardMarkup(resize_keyboard=True).add(KeyboardButton('30 хвилин')).insert(KeyboardButton('45 хвилин')).insert(KeyboardButton('60 хвилин'))
 kb_admin_time.add(b4)

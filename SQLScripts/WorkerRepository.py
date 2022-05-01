@@ -1,5 +1,5 @@
 from datetime import timedelta
-from SQLScripts import db_worker, db_records, db_client
+from db_names import db_client, db_records, db_worker
 import psycopg2
 from config import host, user, password, db_name
 
@@ -88,10 +88,10 @@ async def GetThisDatSchedule(Date, WorkerId):
     try:
         with connection.cursor() as cursor:
             select_query = \
-                'SELECT * FROM ' + db_records.TABLE_NAME  + \
+                'SELECT * FROM ' + db_records.TABLE_NAME + \
                 ' JOIN ' + db_client.TABLE_NAME + ' ON ' + db_records.VISITOR_ID + ' = visitor.id' + \
                 ' WHERE ' + db_records.WORKER_ID + ' = ' + str(WorkerId) + \
-                 ' AND ' + db_records.TIME + ' BETWEEN ' + f'\'{Date}\'' + ' AND ' + f'\'{Date + timedelta(days=1)}\'' + \
+                ' AND ' + db_records.TIME + ' BETWEEN ' + f'\'{Date}\'' + ' AND ' + f'\'{Date + timedelta(days=1)}\'' + \
                 ' ORDER BY ' + db_records.TIME + ';'
                 #' JOIN ' + db_worker.TABLE_NAME  + ' ON ' + db_records.WORKER_ID + ' = ' + 'employees.id' + \
 

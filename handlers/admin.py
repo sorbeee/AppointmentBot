@@ -107,9 +107,12 @@ class FSMAdmin2(StatesGroup):
     description = State()
 
 
-async def cm_start1(callback: types.CallbackQuery):
+async def cm_start1(callback: types.CallbackQuery, state=None):
     if await OwnerRepository.IsOwner(callback.from_user.id):
         await FSMAdmin2.id.set()
+        async with state.proxy() as data:
+            business_id = callback.data.replace('add ', ' ')
+            data[1] = business_id
         await callback.message.answer('Введіть введіть id(повинно відповідати id в telegram) працівника', reply_markup=kb_admin_downloading)
     else:
         await callback.answer('Вийди отсюда, розбійник!!!🤬😡')
@@ -129,7 +132,6 @@ async def load_worker_name(message: types.Message, state: FSMContext):
     if await OwnerRepository.IsOwner(message.from_user.id):
         async with state.proxy() as data:
             id = await BusinessRepository.GetBusinessById(message.from_user.id)
-            data[1] = id[0][0]
             data[2] = message.text
         await FSMAdmin2.next()
         await message.reply('Тепер введіть прізвище')
@@ -209,7 +211,6 @@ async def command_get_businesses(message: types.Message):
                                      InlineKeyboardButton(text=f'Додати працівника', callback_data=f'add {ret[0]}')).insert(
                                      InlineKeyboardButton(text=f'Видалити працівника', callback_data=f'del {ret[0]}')).insert(
                                      InlineKeyboardButton(text=f'Видалити заклда', callback_data=f'b_del {ret[0]}')))
-            await message.reply(str(ret[0]))
     else:
         await message.reply('Вийди отсюда, розбійник!!!🤬😡')
 

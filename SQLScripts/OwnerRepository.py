@@ -1,5 +1,5 @@
 import psycopg2
-from SQLScripts import db_owner
+from db_names import db_owner
 from config import host, user, password, db_name
 
 

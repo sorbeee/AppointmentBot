@@ -1,7 +1,7 @@
 from aiogram import types, Dispatcher
 from create_bot import bot
 from keyboards import client_kb
-from SQLScripts import BusinessRepository, WorkerRepository, RecordsRepository, ClientRepository
+from SQLScripts import BusinessRepository, WorkerRepository, RecordsRepository, ClientRepository, EstimatesRepository
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from datetime import datetime, timedelta, date
 import re
@@ -29,10 +29,12 @@ async def command_reg(message: types.Message):
 async def command_get_all(message: types.Message):
     data = await BusinessRepository.GetAllBusinesses()
     for ret in data:
+        estimate = await EstimatesRepository.GetEstimation(ret[0])
         await bot.send_photo(message.from_user.id, ret[3],
-                    f'{ret[2]}\nОПИС: {ret[4]}\nРЕЖИМ РОБОТИ: {ret[5]}',
+                    f'{ret[2]}\nОПИС: {ret[4]}\nРЕЖИМ РОБОТИ: {ret[5]}\nРейтинг: {estimate[0][0]} / 5  ⭐️',
                     reply_markup=InlineKeyboardMarkup().add(
-                    InlineKeyboardButton(text='Показати список працівників', callback_data=f'workers {ret[0]}')))
+                    InlineKeyboardButton(text='Показати список працівників', callback_data=f'workers {ret[0]}')).add(
+                    InlineKeyboardButton(text='Залишити оцінку', callback_data=f'estimation {ret[0]}')))
 
 
 async def command_show_workers(callback: types.CallbackQuery):
@@ -44,6 +46,40 @@ async def command_show_workers(callback: types.CallbackQuery):
                 f'{ret[2]} {ret[3]}\nОПИС: {ret[7]}\nТривалість процедур: {ret[6]}\nНомер телефону: {ret[5]}'
                 , reply_markup=InlineKeyboardMarkup().add(
                 InlineKeyboardButton(text='Записатися', callback_data=f'appointment {ret[0]} {ret[1]}')))
+
+    await callback.answer()
+
+
+async def command_leave_estimate(callback: types.CallbackQuery):
+    id = callback.data.replace('estimation ', ' ')
+    kb_client_estimating = InlineKeyboardMarkup(row_width=3)
+
+    b1 = InlineKeyboardButton(text='⭐️', callback_data=f'estimate 1 {str(id)}')
+    b2 = InlineKeyboardButton(text='⭐️⭐️', callback_data=f'estimate 2 {str(id)}')
+    b3 = InlineKeyboardButton(text='⭐️⭐️⭐️', callback_data=f'estimate 3 {str(id)}')
+    b4 = InlineKeyboardButton(text='⭐️⭐️⭐️⭐️', callback_data=f'estimate 4 {str(id)}')
+    b5 = InlineKeyboardButton(text='⭐️⭐️⭐️⭐️⭐️', callback_data=f'estimate 5 {str(id)}')
+    kb_client_estimating.insert(b1).insert(b2).insert(b3).insert(b4).insert(b5)
+
+    await callback.message.edit_reply_markup(reply_markup=kb_client_estimating)
+    await callback.answer()
+
+async def command_estimate_insert(callback: types.CallbackQuery):
+    ids = callback.data.replace('estimate ', ' ')
+    new_ids = re.split(' ', ids)
+    business_id = new_ids[3]
+    estimate = new_ids[1]
+
+    if await EstimatesRepository.IsEstimated(business_id, callback.from_user.id):
+        if await EstimatesRepository.AddEstimation(estimate, business_id, callback.from_user.id):
+            await callback.answer('Дякуєм за вашу оцінку')
+        else:
+            await callback.answer('Виникли деякі проблеми. Спробуйте, будь ласка, пізніше')
+    else:
+        if await EstimatesRepository.UpdateEstimation(estimate, business_id, callback.from_user.id):
+            await callback.answer('Ми обновили вашу оцінку. Дякуєм за вашу оцінку')
+        else:
+            await callback.answer('Виникли деякі проблеми. Спробуйте, будь ласка, пізніше')
 
     await callback.answer()
 
@@ -73,7 +109,7 @@ async def command_appointment_hour(callback: types.CallbackQuery):
     new_ids = re.split(' ', ids)
     day = new_ids[1]
     today = datetime.now()
-    if day >= str(datetime.weekday(today)) or datetime.weekday(today) == 6:
+    if day >= str(datetime.weekday(today)):
         worker_id = new_ids[3]
         business_id = new_ids[4]
         data = await BusinessRepository.GetBusinessByBusinessId(business_id)
@@ -130,3 +166,5 @@ def reg_handlers_client(dp: Dispatcher):
     dp.register_callback_query_handler(command_appointment_day, lambda x: x.data and x.data.startswith('appointment '))
     dp.register_callback_query_handler(command_appointment_hour, lambda x: x.data and x.data.startswith('day '))
     dp.register_callback_query_handler(command_appointment_insert, lambda x: x.data and x.data.startswith('time '))
+    dp.register_callback_query_handler(command_leave_estimate, lambda x: x.data and x.data.startswith('estimation '))
+    dp.register_callback_query_handler(command_estimate_insert, lambda x: x.data and x.data.startswith('estimate '))

@@ -3,7 +3,7 @@ from create_bot import bot
 from keyboards import client_kb
 from SQLScripts import BusinessRepository, WorkerRepository, RecordsRepository, ClientRepository, EstimatesRepository
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 import re
 
 
@@ -43,7 +43,7 @@ async def command_show_workers(callback: types.CallbackQuery):
 
     for ret in data:
         await callback.message.answer_photo(ret[4],
-                f'{ret[2]} {ret[3]}\nОПИС: {ret[7]}\nТривалість процедур: {ret[6]}\nНомер телефону: {ret[5]}'
+                f'{ret[2]} {ret[3]}\nОПИС: {ret[7]}\nТривалість процедур: {ret[6]}хв.\nНомер телефону: {ret[5]}'
                 , reply_markup=InlineKeyboardMarkup().add(
                 InlineKeyboardButton(text='Записатися', callback_data=f'appointment {ret[0]} {ret[1]}')))
 
@@ -114,7 +114,6 @@ async def command_appointment_hour(callback: types.CallbackQuery):
         business_id = new_ids[4]
         data = await BusinessRepository.GetBusinessByBusinessId(business_id)
         worker = await WorkerRepository.GetWorkerById(worker_id)
-
         date = datetime.now() + timedelta((int(day) - int(datetime.weekday(today))))
 
         work_time = re.split(' - ', data[0][5])

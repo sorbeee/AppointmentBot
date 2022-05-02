@@ -27,7 +27,7 @@ async def IsBusy(WorkerId, Date):
             cursor.execute(select_query)
             data = cursor.fetchall()
 
-            return len(data) <= 0
+            return len(data) == 0
     except Exception as _ex:
         print("[INFO] error database", _ex)
 

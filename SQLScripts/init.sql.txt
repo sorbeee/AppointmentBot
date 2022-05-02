@@ -1,13 +1,13 @@
-CREATE DATABASE RegistrationBot
+CREATE DATABASE AppointmentBot
 
 CREATE TABLE Owners
 (
-    id bigint NOT NULL UNIQUE
+    id bigint NOT NULL UNIQUE primary key
 );
 
 CREATE TABLE Visitor 
 (
-    id bigint NOT NULL UNIQUE,
+    id bigint NOT NULL UNIQUE primary key,
     name varchar NOT NULL,
     phone_number varchar NOT NULL UNIQUE
 );
@@ -24,8 +24,8 @@ CREATE TABLE Business
 
 CREATE TABLE Employees
 (
-   id bigint NOT NULL UNIQUE,
-   business_id bigint NOT NULL references Business(id),
+   id bigint NOT NULL UNIQUE primary key,
+   business_id bigint NOT NULL references Business(id) ON DELETE CASCADE,
    name varchar NOT NULL,
    lastname varchar NOT NULL,
    photo_id varchar NOT NULL UNIQUE,
@@ -36,15 +36,15 @@ CREATE TABLE Employees
 
 CREATE TABLE Records
 (
-   business_id bigint NOT NULL references Business(id),
-   visitor_id bigint NOT NULL references Visitor(id),
-   employee_id bigint NOT NULL references Employees(id),
+   business_id bigint NOT NULL references Business(id) ON DELETE CASCADE,
+   visitor_id bigint NOT NULL references Visitor(id) ON DELETE CASCADE,
+   employee_id bigint NOT NULL references Employees(id) ON DELETE CASCADE,
    start_time timestamp NOT NULL
 );
 
 CREATE TABLE Estimates
 (
    estimate bigint NOT NULL,
-   business_id bigint NOT NULL references Business(id),
-   visitor_id bigint NOT NULL references Visitor(id)
+   business_id bigint NOT NULL references Business(id) ON DELETE CASCADE,
+   visitor_id bigint NOT NULL references Visitor(id) ON DELETE CASCADE
 );

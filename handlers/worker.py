@@ -20,18 +20,24 @@ async def command_schedule(message: types.Message):
             time = str(datetime.datetime.now().date()) + ' 00:00:00'
             date = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
             data = await WorkerRepository.GetThisDatSchedule(date, message.from_user.id)
-            info = ''
-            for ret in data:
-                info += f'Час: {ret[3]}\nІм\'я: {ret[5]}\nНомер телефону: {ret[6]}\n\n'
-            await message.reply(info)
+            if len(data) > 0:
+                info = ''
+                for ret in data:
+                    info += f'Час: {ret[3]}\nІм\'я: {ret[5]}\nНомер телефону: {ret[6]}\n\n'
+                await message.reply(info)
+            else:
+                await message.reply("У вас немає жодних записів на цей день")
         elif day == days[1]:
             time = str(datetime.datetime.now().date() + datetime.timedelta(days=1)) + ' 00:00:00'
             date = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
             data = await WorkerRepository.GetThisDatSchedule(date, message.from_user.id)
-            info = ''
-            for ret in data:
-                info += f'Час: {ret[3]}\nІм\'я: {ret[5]}\nНомер телефону: {ret[6]}\n\n'
-            await message.reply(info)
+            if len(data) > 0:
+                info = ''
+                for ret in data:
+                    info += f'Час: {ret[3]}\nІм\'я: {ret[5]}\nНомер телефону: {ret[6]}\n\n'
+                await message.reply(info)
+            else:
+                await message.reply("У вас немає жодних записів на цей день")
     else:
         await message.reply('Ви не є працівником')
 
@@ -52,10 +58,13 @@ async def comaand_get_day(message: types.Message, state: FSMContext):
             day = datetime.datetime.strptime(message.text, "%Y-%m-%d")
             await bot.send_message(message.from_user.id, f'{day}')
             data = await WorkerRepository.GetThisDatSchedule(day, message.from_user.id)
-            info = ''
-            for ret in data:
-                info += f'Час: {ret[3]}\nІм\'я: {ret[5]}\nНомер телефону: {ret[6]}\n\n'
-            await message.reply(info)
+            if len(data) > 0:
+                info = ''
+                for ret in data:
+                    info += f'Час: {ret[3]}\nІм\'я: {ret[5]}\nНомер телефону: {ret[6]}\n\n'
+                await message.reply(info)
+            else:
+                await message.reply("У вас немає жодних записів на цей день")
             await state.finish()
         except Exception as _ex:
             print("[INFO] error ", _ex)
